@@ -1,0 +1,37 @@
+Đoạn mã này bao gồm hai phần chính:
+
+Xử lý logic mệnh đề:
+
+Kiểm tra cú pháp biểu thức logic:
+
+laToanTu: Xác định ký tự có phải là một toán tử logic hay không.
+kyTuHopLe: Kiểm tra tính hợp lệ của từng ký tự trong biểu thức.
+ngoacCanBang: Đảm bảo rằng các dấu ngoặc trong biểu thức được cân bằng.
+bieuThucHopLe: Xác nhận biểu thức logic mệnh đề hợp lệ dựa trên các tiêu chí trên.
+Tính toán giá trị biểu thức logic mệnh đề:
+
+tinhGiaTriBieuThuc: Tính toán giá trị của biểu thức logic dựa trên tập hợp các giá trị biến đã cho. Sử dụng ngăn xếp (stack) để thực hiện phép tính theo thứ tự ưu tiên của toán tử.
+Xử lý logic vị từ:
+
+Kiểm tra tính đúng/sai của công thức logic vị từ:
+tinhGiaTriLogicViTu: Duyệt qua tất cả các giá trị trong miền (domain) và áp dụng các hàm vị từ P và Q để kiểm tra tính đúng/sai của biểu thức logic vị từ.
+Chương trình chính (main):
+
+Đầu vào:
+Người dùng nhập một biểu thức logic vị từ.
+Xác định miền giá trị (domain) và cung cấp các giá trị cho miền.
+Hàm vị từ mặc định:
+P(x): Trả về true nếu x > 1.
+Q(x): Trả về true nếu x là số chẵn.
+Xử lý:
+Chương trình kiểm tra tính hợp lệ của biểu thức.
+Tính giá trị logic của biểu thức với miền giá trị và các hàm vị từ.
+Đầu ra:
+In kết quả kiểm tra tính đúng/sai của biểu thức.
+Các loại toán tử hỗ trợ:
+!: Phủ định.
+&: Phép "và".
+|: Phép "hoặc".
+^: XOR.
+>: Kéo theo.
+: Tương đương.
