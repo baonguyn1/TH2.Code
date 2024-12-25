@@ -10,7 +10,7 @@
 using namespace std;
 
 bool laToanTu(char c) {
-    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '<';
+    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '==';
 }
 
 bool kyTuHopLe(char c) {
@@ -52,12 +52,12 @@ bool tinhGiaTriBieuThuc(const string& expr, const unordered_map<char, bool>& val
 
     auto apDungToanTu = [](char op, bool operand1, bool operand2 = false) -> bool {
         switch (op) {
-            case '!': return !operand1;
-            case '&': return operand1 && operand2; // phep phu dinh
-            case '|': return operand1 || operand2; // phep va
+            case '!': return !operand1; // phep phu dinh
+            case '&': return operand1 && operand2; // phep va
+            case '|': return operand1 || operand2; // phep hoac
             case '^': return operand1 ^ operand2; // phep loai
             case '>': return !operand1 || operand2; // phep keo theo
-            case '<': return operand1 == operand2; // phep tuong duong
+            case '==': return operand1 == operand2; // phep tuong duong
             default: throw invalid_argument("Toan tu khong hop le");
         }
     };
