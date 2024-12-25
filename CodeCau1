@@ -8,7 +8,7 @@
 using namespace std;
 
 bool laToanTu(const string& c) {
-    return c == "&" || c == "|" || c == "!" || c == "^" || c == ">" || c == "==";
+    return c == "&" || c == "|" || c == "!" || c == "^" || c == ">" || c == "<";
 }
 
 bool kyTuHopLe(char c) {
@@ -54,7 +54,7 @@ bool tinhGiaTriBieuThuc(const string& expr, const unordered_map<char, bool>& val
         if (op == "|") return operand1 || operand2;
         if (op == "^") return operand1 ^ operand2;
         if (op == ">") return !operand1 || operand2;
-        if (op == "==") return operand1 == operand2;
+        if (op == "<") return operand1 == operand2;
         throw invalid_argument("Toan tu khong hop le");
     };
 
