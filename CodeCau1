@@ -7,12 +7,12 @@
 
 using namespace std;
 
-bool laToanTu(char c) {
-    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '==';
+bool laToanTu(const string& c) {
+    return c == "&" || c == "|" || c == "!" || c == "^" || c == ">" || c == "==";
 }
 
 bool kyTuHopLe(char c) {
-    return isalpha(c) || laToanTu(c) || c == '(' || c == ')';
+    return isalpha(c) || laToanTu(string(1, c)) || c == '(' || c == ')';
 }
 
 bool ngoacCanBang(const string& expr) {
@@ -46,18 +46,16 @@ bool bieuThucHopLe(const string& expr) {
 
 bool tinhGiaTriBieuThuc(const string& expr, const unordered_map<char, bool>& values) {
     stack<bool> operands;
-    stack<char> operators;
+    stack<string> operators;
 
-    auto apDungToanTu = [](char op, bool operand1, bool operand2 = false) -> bool {
-        switch (op) {
-            case '!': return !operand1;
-            case '&': return operand1 && operand2; // phep phu dinh
-            case '|': return operand1 || operand2; // phep va
-            case '^': return operand1 ^ operand2; // phep loai
-            case '>': return !operand1 || operand2; // phep keo theo
-            case '==': return operand1 == operand2; // phep tuong duong
-            default: throw invalid_argument("Toan tu khong hop le");
-        }
+    auto apDungToanTu = [](const string& op, bool operand1, bool operand2 = false) -> bool {
+        if (op == "!") return !operand1;
+        if (op == "&") return operand1 && operand2;
+        if (op == "|") return operand1 || operand2;
+        if (op == "^") return operand1 ^ operand2;
+        if (op == ">") return !operand1 || operand2;
+        if (op == "==") return operand1 == operand2;
+        throw invalid_argument("Toan tu khong hop le");
     };
 
     for (size_t i = 0; i < expr.length(); ++i) {
@@ -71,41 +69,42 @@ bool tinhGiaTriBieuThuc(const string& expr, const unordered_map<char, bool>& val
             }
             operands.push(values.at(c));
         } else if (c == '(') {
-            operators.push(c);
+            operators.push("(");
         } else if (c == ')') {
-            while (!operators.empty() && operators.top() != '(') {
-                char op = operators.top(); operators.pop();
+            while (!operators.empty() && operators.top() != "(") {
+                string op = operators.top(); operators.pop();
                 bool operand1 = operands.top(); operands.pop();
-                if (op == '!') {
+                if (op == "!") {
                     operands.push(apDungToanTu(op, operand1));
                 } else {
                     bool operand2 = operands.top(); operands.pop();
                     operands.push(apDungToanTu(op, operand2, operand1));
                 }
             }
-            if (!operators.empty() && operators.top() == '(') {
+            if (!operators.empty() && operators.top() == "(") {
                 operators.pop();
             }
-        } else if (laToanTu(c)) {
-            while (!operators.empty() && operators.top() != '(' &&
-                   (c == '!' ? false : (operators.top() == '&' || operators.top() == '|' || operators.top() == '^' || operators.top() == '>' || operators.top() == '<'))) {
-                char op = operators.top(); operators.pop();
+        } else if (laToanTu(string(1, c))) {
+            string op(1, c);
+            while (!operators.empty() && operators.top() != "(" &&
+                   (op == "!" ? false : (operators.top() == "&" || operators.top() == "|" || operators.top() == "^" || operators.top() == ">" || operators.top() == "=="))) {
+                string op_top = operators.top(); operators.pop();
                 bool operand1 = operands.top(); operands.pop();
-                if (op == '!') {
-                    operands.push(apDungToanTu(op, operand1));
+                if (op_top == "!") {
+                    operands.push(apDungToanTu(op_top, operand1));
                 } else {
                     bool operand2 = operands.top(); operands.pop();
-                    operands.push(apDungToanTu(op, operand2, operand1));
+                    operands.push(apDungToanTu(op_top, operand2, operand1));
                 }
             }
-            operators.push(c);
+            operators.push(op);
         }
     }
 
     while (!operators.empty()) {
-        char op = operators.top(); operators.pop();
+        string op = operators.top(); operators.pop();
         bool operand1 = operands.top(); operands.pop();
-        if (op == '!') {
+        if (op == "!") {
             operands.push(apDungToanTu(op, operand1));
         } else {
             bool operand2 = operands.top(); operands.pop();
