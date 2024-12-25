@@ -12,7 +12,7 @@ using namespace std;
 
 // Ham kiem tra ky tu co phai toan tu
 bool laToanTu(char c) {
-    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '<';
+    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '==';
 }
 
 // Ham kiem tra ky tu co hop le
