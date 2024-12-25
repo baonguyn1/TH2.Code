@@ -1,0 +1,152 @@
+#include <iostream>
+#include <stack>
+#include <unordered_map>
+#include <string>
+#include <cctype>
+#include <stdexcept>
+
+using namespace std;
+
+bool laToanTu(char c) {
+    return c == '&' || c == '|' || c == '!' || c == '^' || c == '>' || c == '==';
+}
+
+bool kyTuHopLe(char c) {
+    return isalpha(c) || laToanTu(c) || c == '(' || c == ')';
+}
+
+bool ngoacCanBang(const string& expr) {
+    stack<char> s;
+    for (char c : expr) {
+        if (c == '(') {
+            s.push(c);
+        } else if (c == ')') {
+            if (s.empty() || s.top() != '(') {
+                return false;
+            }
+            s.pop();
+        }
+    }
+    return s.empty();
+}
+
+bool bieuThucHopLe(const string& expr) {
+    if (!ngoacCanBang(expr)) {
+        return false;
+    }
+
+    for (char c : expr) {
+        if (!kyTuHopLe(c) && !isspace(c)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool tinhGiaTriBieuThuc(const string& expr, const unordered_map<char, bool>& values) {
+    stack<bool> operands;
+    stack<char> operators;
+
+    auto apDungToanTu = [](char op, bool operand1, bool operand2 = false) -> bool {
+        switch (op) {
+            case '!': return !operand1;
+            case '&': return operand1 && operand2; // phep phu dinh
+            case '|': return operand1 || operand2; // phep va
+            case '^': return operand1 ^ operand2; // phep loai
+            case '>': return !operand1 || operand2; // phep keo theo
+            case '==': return operand1 == operand2; // phep tuong duong
+            default: throw invalid_argument("Toan tu khong hop le");
+        }
+    };
+
+    for (size_t i = 0; i < expr.length(); ++i) {
+        char c = expr[i];
+
+        if (isspace(c)) continue;
+
+        if (isalpha(c)) {
+            if (values.find(c) == values.end()) {
+                throw invalid_argument("Bien khong duoc dinh nghia: " + string(1, c));
+            }
+            operands.push(values.at(c));
+        } else if (c == '(') {
+            operators.push(c);
+        } else if (c == ')') {
+            while (!operators.empty() && operators.top() != '(') {
+                char op = operators.top(); operators.pop();
+                bool operand1 = operands.top(); operands.pop();
+                if (op == '!') {
+                    operands.push(apDungToanTu(op, operand1));
+                } else {
+                    bool operand2 = operands.top(); operands.pop();
+                    operands.push(apDungToanTu(op, operand2, operand1));
+                }
+            }
+            if (!operators.empty() && operators.top() == '(') {
+                operators.pop();
+            }
+        } else if (laToanTu(c)) {
+            while (!operators.empty() && operators.top() != '(' &&
+                   (c == '!' ? false : (operators.top() == '&' || operators.top() == '|' || operators.top() == '^' || operators.top() == '>' || operators.top() == '<'))) {
+                char op = operators.top(); operators.pop();
+                bool operand1 = operands.top(); operands.pop();
+                if (op == '!') {
+                    operands.push(apDungToanTu(op, operand1));
+                } else {
+                    bool operand2 = operands.top(); operands.pop();
+                    operands.push(apDungToanTu(op, operand2, operand1));
+                }
+            }
+            operators.push(c);
+        }
+    }
+
+    while (!operators.empty()) {
+        char op = operators.top(); operators.pop();
+        bool operand1 = operands.top(); operands.pop();
+        if (op == '!') {
+            operands.push(apDungToanTu(op, operand1));
+        } else {
+            bool operand2 = operands.top(); operands.pop();
+            operands.push(apDungToanTu(op, operand2, operand1));
+        }
+    }
+
+    return operands.top();
+}
+
+int main() {
+    string bieuthuc;
+    cout << "Nhap bieu thuc logic: ";
+    getline(cin, bieuthuc);
+
+    if (!bieuThucHopLe(bieuthuc)) {
+        cout << "Bieu thuc khong hop le." << endl;
+        return 1;
+    }
+
+    int n;
+    cout << "Nhap so luong bien: ";
+    cin >> n;
+
+    unordered_map<char, bool> values;
+    for (int i = 0; i < n; ++i) {
+        char var;
+        bool value;
+        cout << "Nhap ten bien (mot ky tu): ";
+        cin >> var;
+        cout << "Nhap gia tri cua no (0 hoac 1): ";
+        cin >> value;
+        values[var] = value;
+    }
+
+    try {
+        bool result = tinhGiaTriBieuThuc(bieuthuc, values);
+        cout << "Ket qua cua bieu thuc la: " << (result ? "dung" : "sai") << endl;
+    } catch (const exception& e) {
+        cout << "Loi: " << e.what() << endl;
+    }
+
+    return 0;
+}
